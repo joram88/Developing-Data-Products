@@ -69,6 +69,7 @@ fig %>% layout(title = "Countries of the World", xaxis = x, yaxis = y)
 #https://plot.ly/~chelsea_lyn/12871/_2016-summer-olympic-medal-count/#code 
 
 
+ame <- as.vector(efi2$Region =="Americas")
 
 
   
