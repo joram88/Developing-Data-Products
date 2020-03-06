@@ -23,10 +23,11 @@ efi2$Score <- as.numeric(efi2$Score)
 efi2$GDP_growth <- as.numeric(efi2$GDP_growth)
 efi2$GDP_pc <- as.numeric(gsub("[\\$,]","",efi2$GDP_pc))
 
-#Removing outliers (Venezuela, Cuba, North Korea)
+#Removing outliers (Venezuela, Cuba, North Korea) and we create a log variable
 
 efi2 <- efi2 %>% 
-        filter(Score>35)
+        filter(Score>35) %>% 
+        mutate(lGDP_pc = log(GDP_pc))
 
 #Create formats for later
 
@@ -63,19 +64,20 @@ fig %>% layout(title = "Countries of the World", xaxis = x, yaxis = y)
 
 #No correlation. So how about GDP per capita and Score
 
-summary(fit <- lm(Score ~ GDP_pc, data = efi2))
+summary(fit <- lm(Score ~ log(GDP_pc), data = efi2))
 
 #Strong correlation shown here
 
 ggplot(efi2, aes(x = Score, y = GDP_pc))+
-        geom_point(aes(col = Region))+geom_smooth(method = "lm", se = F)+
+        geom_point(aes(col = Region))+
+        geom_smooth(method="loess", formula = y ~ x, span=3)+
         scale_y_continuous(label = dollar, limits = c(0,130000))+
         labs(title = "Countries of the World", y = "GDP per capita (USD)", x = "Economic Freedom Index")
 
 #Correlation holds even when broken down by region
 
 ggplot(efi2, aes(x = Score, y = GDP_pc))+
-        geom_point(aes(col = Region))+geom_smooth(method = "lm", se = F)+
+        geom_point(aes(col = Region))+geom_smooth(method="loess", formula = y ~ x, span=3, se=FALSE)+
         facet_wrap(~Region)+
         scale_y_continuous(label = dollar)+
         labs(title = "Regions of the World", y = "GDP per capita (USD)", x = "Economic Freedom Index")
